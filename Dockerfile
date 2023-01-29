@@ -15,17 +15,20 @@ RUN strip --strip-all /builddir/sslscan
 # Print the output of ldd so we can see what dynamic libraries that sslscan is still dependent upon.
 RUN echo "ldd output:" && ldd /builddir/sslscan
 RUN echo "ls -al output:" && ls -al /builddir/sslscan
-
+RUN ls -al /lib/ld-musl-aarch64.so.1 /lib/ld-musl-aarch64.so.1
 
 # Start with an empty container for our final build.
 FROM scratch
 
 # Copy over the sslscan executable from the intermediate build container, along with the dynamic libraries it is dependent upon (see output of ldd, above).
-COPY --from=builder /builddir/sslscan /sslscan
+COPY --from=builder /bin/* /bin/
+COPY --from=builder /builddir/sslscan /bin/sslscan
 COPY --from=builder /lib/libz.so.1 /lib/libz.so.1
-COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
+# Fix for ARM builders - copy any architecture musl.
+COPY --from=builder /lib/ld-musl-*.so.1 /lib/
 
 # Drop root privileges.
-USER 65535:65535
+# USER 65535:65535
+# Remain as writable user.
 
-ENTRYPOINT ["/sslscan"]
+ENTRYPOINT ["/bin/ash"]
