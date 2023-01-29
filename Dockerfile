@@ -15,7 +15,6 @@ RUN strip --strip-all /builddir/sslscan
 # Print the output of ldd so we can see what dynamic libraries that sslscan is still dependent upon.
 RUN echo "ldd output:" && ldd /builddir/sslscan
 RUN echo "ls -al output:" && ls -al /builddir/sslscan
-RUN ls -al /lib/ld-musl-aarch64.so.1 /lib/ld-musl-aarch64.so.1
 
 # Start with an empty container for our final build.
 FROM scratch
